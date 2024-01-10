@@ -13,6 +13,8 @@ import { useRouter } from "expo-router";
 import useAuth from "../hook/useAuth";
 import useTareas from "../hook/useTareas";
 
+//TODO: Solucionar el estilo con ios, del modal, añadir padding o margin en caso de ios
+
 const Header = () => {
 
     const router = useRouter();
@@ -59,11 +61,6 @@ const Header = () => {
                             onPress={() => router.push('categoriasRoute')}
                         >
                             <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginLeft: 20 }}>Categorias</Text>
-                        </Pressable>
-                        <Pressable
-                            style={{ height: 40, marginBottom: 15 }}
-                        >
-                            <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginLeft: 20 }}>Configuración</Text>
                         </Pressable>
                     </View>
                     <Pressable

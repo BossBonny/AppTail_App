@@ -1,5 +1,7 @@
 export const formatearFecha = fecha => {
 
+    if(!fecha) return
+
     const nuevaFecha = new Date(fecha.split('T')[0])
 
     const opciones = {

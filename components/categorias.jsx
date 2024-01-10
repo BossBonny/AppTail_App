@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, TextInput, View, SafeAreaView, KeyboardAvoidingView, Pressable, Modal, FlatList } from 'react-native'
-import { useRouter } from "expo-router";
+import { StyleSheet, Text, TextInput, View, Pressable, Modal, FlatList } from 'react-native'
 import clienteAxios from '../config/clienteAxios';
 
 import { AntDesign, Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -13,12 +12,11 @@ import { formatearFecha } from '../helpers/formatearFecha';
 //TODO: no se pueden crear dos categorias iguales, y añadir mensaje de error, añadir limite de caracteres
 //TODO: Añadir stylos como el de "Eliminado corerctamente" o editado o creado, (OPCIONAL)
 
+//TODO: Modal EliminarTarea se puede reusar en RecentTask y más, checkar otros modales
+
 
 const Categorias = () => {
 
-    const router = useRouter();
-
-    const [modalVisible, setModalVisible] = useState(false);
     const [modalCrearCat, setModalCrearCat] = useState(false);
     const [modalEditarCat, setModalEditarCat] = useState(false);
     const [modalEliminarCat, setModalEliminarCat] = useState(false);

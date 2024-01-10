@@ -2,7 +2,7 @@ import React from 'react';
 import { AuthProvider } from '../context/AuthProvider';
 import RutaProtegida from '../layouts/RutaProtegida';
 
-const index = () => {
+const Index = () => {
 
     return (
         <AuthProvider>
@@ -13,4 +13,4 @@ const index = () => {
 
 }
 
-export default index
+export default Index

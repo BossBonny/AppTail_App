@@ -16,7 +16,7 @@ const AuthProvider = ({children}) => {
             if(!token){
                 setCargando(false)
                 return
-            }
+            }   
 
             const config = {
                 headers: {
@@ -27,10 +27,10 @@ const AuthProvider = ({children}) => {
 
             try {
                 const {data} = await clienteAxios('/usuarios/perfil',config);
-
                 setAuth(data)
             } catch (error) {
                 setAuth({})
+                console.log(error);
             }
             setCargando(false)
         } 
@@ -38,12 +38,13 @@ const AuthProvider = ({children}) => {
         autenticarUsuario();
     },[])
 
+
     return (
         <AuthContext.Provider
             value={{
                 setAuth,
                 auth,
-                cargando
+                cargando,
             }}
         >
             {children}

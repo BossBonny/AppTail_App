@@ -18,10 +18,12 @@ import clienteAxios from "../config/clienteAxios";
 import Alerta from "../helpers/Alerta";
 import useAuth from "../hook/useAuth";
 
+//TODO: Hacer textos planos para los correos
+
 const Login = () => {
 
     const router = useRouter();
-    const { setAuth } = useAuth();
+    const { setAuth, auth } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -40,11 +42,10 @@ const Login = () => {
         }
 
         try {
-
-            console.log('Hasta aquí llega');
             const { data } = await clienteAxios.post('/usuarios/login', { email, password })
 
-            console.log('Desde el Frontend',data);
+            if(!data) return
+
             setAlerta({
                 msg: "Usuario Correcto",
                 error: false
@@ -53,9 +54,10 @@ const Login = () => {
             await AsyncStorage.setItem('token', data.token)
 
             setAuth(data)
+
             setTimeout(() => {
                 setAlerta({})
-                router.push('/RutaProtegida')
+                router.push('/home');
             }, 3000)
         } catch (error) {
             setAlerta({
@@ -69,6 +71,7 @@ const Login = () => {
     const { msg } = alerta
 
     return (
+        
         <SafeAreaView>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
