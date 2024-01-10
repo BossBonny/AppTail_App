@@ -16,7 +16,6 @@ import useTareas from '../hook/useTareas';
 import clienteAxios from '../config/clienteAxios';
 import Alerta from '../helpers/Alerta';
 
-//TODO: Añadir el creador de la tarea
 //TODO: Añadir funcionalidad para colaboradores
 
 const Tarea = () => {

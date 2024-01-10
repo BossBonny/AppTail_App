@@ -3,7 +3,6 @@ import {
     Text,
     View,
     TextInput,
-    Platform,
     Pressable,
     ScrollView,
     FlatList,
@@ -16,26 +15,28 @@ import useTareas from '../hook/useTareas';
 import clienteAxios from '../config/clienteAxios';
 import Alerta from '../helpers/Alerta';
 import useAuth from '../hook/useAuth';
+import ModalEliminar from './modalEliminar';
 
-//TODO: Añadir funcionalidad para colaboradores
+//TODO: hacer un componente modal de eliminar cosas
 
 const AddTask = () => {
 
     const router = useRouter();
 
     const { auth } = useAuth();
-    const { mostrarAlerta, alerta } = useTareas();
+    const { mostrarAlerta, alerta, categorias, users } = useTareas();
 
-    const [categorias, setCategorias] = useState([]);
+    const [cat, setCat] = useState([]);
 
     const [opcional, setOpcional] = useState(false);
     const [modalEtiqueta, setModalEtiqueta] = useState(false);
+    const [modalColab, setModalColab] = useState(false);
     const [etiquetaEliminar, setEtiquetaEliminar] = useState({});
+    const [colabEliminar, setColabEliminar] = useState({});
     const [etiquetaEliminada, setEtiquetaEliminada] = useState(false);
     const [addCategoria, setAddCategoria] = useState(false);
     const [creado, setCreado] = useState(false);
     const [nombre, setNombre] = useState('');
-    const [cat, setCat] = useState({});
     const [prioridad, setPrioridad] = useState('');
     const [etiqueta, setEtiqueta] = useState({
         nombre: '',
@@ -44,20 +45,9 @@ const AddTask = () => {
     const [count, setCount] = useState(0);
     const [etiquetas, setEtiquetas] = useState([]);
 
-
-    useEffect(() => {
-        const fetchCategorieData = async () => {
-
-            try {
-                const response = await clienteAxios.get(`/categorias`);
-                setCategorias(response.data)
-            } catch (error) {
-                console.log("error fetching Categorie Data", error);
-            }
-        }
-        fetchCategorieData();
-
-    }, [])
+    const [col, setCol] = useState('')
+    const [colaboradores, setColaboradores] = useState([])
+    const [usuariosFiltrados, setUsuariosFiltrados] = useState({})
 
     const handleNuevaEtiqueta = () => {
         if (etiqueta.nombre !== '') {
@@ -90,6 +80,44 @@ const AddTask = () => {
 
     }
 
+    const filtrarUsers = () => {
+        if (col) {
+            const newData = users.filter(item => {
+                const itemData = item.nombre ? item.nombre.toLowerCase() : ''.toLowerCase();
+                const textdata = col.toLowerCase();
+
+                return itemData.indexOf(textdata) > -1;
+            })
+            setUsuariosFiltrados(newData)
+        } else {
+            setUsuariosFiltrados(users)
+        }
+    }
+
+    const agregarColaborador = (item) => {
+
+        let existe = false;
+
+        colaboradores.map( c => {
+            if(c._id === item._id){
+                existe = true;
+                return
+            }
+        })
+
+        if(!existe){
+            setColaboradores([...colaboradores, item])
+        }
+    }
+
+    const eliminarColaborador = () => {
+        const nuevosColaboradores = colaboradores.filter(c => c._id !== colabEliminar._id);
+
+        setColaboradores(nuevosColaboradores);
+
+        setModalColab(false)
+    }
+
 
     const handleSubmit = async () => {
 
@@ -103,13 +131,14 @@ const AddTask = () => {
             return mostrarAlerta({ msg: 'La prioridad es obligatoria', error: true });
         }
 
+
         const categoria = cat
         const creador = auth._id
 
 
         try {
 
-            await clienteAxios.post(`/tareas`, { nombre, categoria, prioridad, etiquetas, creador })
+            await clienteAxios.post(`/tareas`, { nombre, categoria, prioridad, etiquetas, creador, colaboradores })
 
             setCreado(true)
 
@@ -124,12 +153,8 @@ const AddTask = () => {
 
     }
 
-    const { msg } = alerta;
-
-    return (
-        <ScrollView style={{ padding: 40 }}>
-            <View>
-                <Modal
+    /*
+    <Modal
                     animationType="slide"
                     transparent={true}
                     visible={modalEtiqueta}
@@ -156,6 +181,15 @@ const AddTask = () => {
                         </View>
                     </View>
                 </Modal>
+    */
+
+    const { msg } = alerta;
+
+    return (
+        <ScrollView style={{ padding: 40 }}>
+            <View>
+                {modalEtiqueta && <ModalEliminar item={etiquetaEliminar} setModal={setModalEtiqueta} modal={modalEtiqueta} eliminarEtiqueta={handleEliminarEtiqueta}/>}
+                {modalColab && <ModalEliminar item={colabEliminar} setModal={setModalColab} modal={modalColab} eliminarEtiqueta={eliminarColaborador}/>}
                 <Text style={{ fontSize: 40, fontWeight: '900', marginVertical: 50, alignSelf: 'center' }}>
                     New Task
                 </Text>
@@ -279,15 +313,57 @@ const AddTask = () => {
                             </View>
                             : <View style={{ marginBottom: 50 }}></View>
                         }
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, marginBottom: 30 }}>
+                            <Text style={{ fontSize: 20, fontWeight: '700', alignSelf: 'baseline' }}>Colaboradores:</Text>
+                        </View>
+                        {
+                            colaboradores &&
+                            <FlatList
+                                style={{ padding: 5, marginTop: 20, marginBottom: 50}}
+                                data={colaboradores}
+                                scrollEnabled={false}
+                                contentContainerStyle={{ alignSelf: 'flex-start' }}
+                                numColumns={3}
+                                renderItem={({ item }) =>
+                                    <Pressable
+                                        style={{height: 40, width: 110, backgroundColor: '#CEE4FE', margin: 5, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', borderRadius: 5}}
+                                        delayLongPress={1000}
+                                        onLongPress={() => { setColabEliminar(item), setModalColab(!modalColab) }}
+                                    >
+                                        <Text style={{ fontSize: 12, fontWeight: '600' }}>{item.nombre}</Text>
+                                    </Pressable>
+                                }
+                                keyExtractor={item => item.id}
+                            />
+                        }
+                        <TextInput
+                            style={{ width: 350, borderBottomWidth: 1, marginLeft: 20, marginBottom: 20, fontSize: 15 }}
+                            placeholder='Busca el colaborador'
+                            onChangeText={(text) => { setCol(text), filtrarUsers() }}
+                        />
+                        {col &&
+                            usuariosFiltrados.map((item, index) => {
+                                return (
+                                    <Pressable
+                                        key={index}
+                                        style={{ height: 50, width: 300, backgroundColor: '#CEE4FE', margin: 5, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', borderRadius: 10 }}
+                                        onPress={() => agregarColaborador(item)}
+                                    >
+                                        <Text style={{ fontSize: 15, fontWeight: '600' }}>{item.nombre}</Text>
+                                        <Text style={{ fontSize: 15, fontWeight: '600', color: 'gray' }}>{item.email}</Text>
+                                    </Pressable>
+                                )
+                            })
+                        }
                     </View>
                 }
                 <Pressable
-                    style={[creado ? {backgroundColor: 'green'} : {backgroundColor: 'black'} ,{ height: 60, marginVertical: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 20, marginBottom: 200 }]}
+                    style={[creado ? { backgroundColor: 'green' } : { backgroundColor: 'black' }, { height: 60, marginVertical: 50, alignItems: 'center', justifyContent: 'center', borderRadius: 20, marginBottom: 200 }]}
                     onPress={() => handleSubmit()}
                 >
-                    {creado 
-                        ?   <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', color: 'white' }}>Tarea Creada</Text>
-                        :   <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', color: 'white' }}>Crear Tarea</Text>
+                    {creado
+                        ? <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', color: 'white' }}>Tarea Creada</Text>
+                        : <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', color: 'white' }}>Crear Tarea</Text>
                     }
                 </Pressable>
             </View>

@@ -14,6 +14,7 @@ const TareasProvider = ({ children }) => {
     const [tarea, setTarea] = useState([]);
     const [alerta, setAlerta] = useState([]);
     const [categorias, setCategorias] = useState({})
+    const [users, setUsers] = useState({})
 
     useEffect(() => {
         const fetchTareasData = async () => {
@@ -33,6 +34,7 @@ const TareasProvider = ({ children }) => {
                 const { data } = await clienteAxios('/usuarios/perfil', config);
 
                 const response = await clienteAxios.get(`/tareas/${data._id}`);
+
                 setTareas(response.data)
 
             } catch (error) {
@@ -54,6 +56,34 @@ const TareasProvider = ({ children }) => {
             }
         }
         fetchCategorieData();
+
+    }, [])
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+
+            try {
+
+                const token = await AsyncStorage.getItem('token');
+                if (!token) return
+
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+
+                const { data } = await clienteAxios('/usuarios/perfil', config);
+
+                const response = await clienteAxios.get(`usuarios/usuarios/${data._id}`);
+                
+                setUsers(response.data)
+            } catch (error) {
+                console.log("error fetching Users Data", error);
+            }
+        }
+        fetchUsers();
 
     }, [])
 
@@ -124,7 +154,8 @@ const TareasProvider = ({ children }) => {
                 setTarea,
                 tarea,
                 handleTarea,
-                obtenerCategoria
+                obtenerCategoria,
+                users
             }}
         >
             {children}
