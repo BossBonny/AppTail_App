@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
     Text,
     View,
@@ -12,9 +13,17 @@ import { formatearFecha } from "../helpers/formatearFecha";
 import useTareas from "../hook/useTareas";
 
 
+
 const RecentTask = () => {
 
-    const { tareas, handleTarea, obtenerCategoria } = useTareas();
+    const { handleTarea, obtenerCategoria, obtenerLista, lista } = useTareas();
+
+    useEffect(() => {
+        obtenerLista()
+    })
+
+    //AQUI NOS HEMOS QUEDADO
+
 
     return (
         <View style={{ height: '88%', marginTop: 20 }}>
@@ -29,7 +38,7 @@ const RecentTask = () => {
             </View>
             <FlatList
                 style={{ width: '100%', paddingHorizontal: 15 }}
-                data={tareas}
+                data={lista}
                 renderItem={({ item }) =>
                     <Pressable style={{
                         marginBottom: 40,
@@ -45,7 +54,7 @@ const RecentTask = () => {
                     >
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                             <View style={{ height: 30, maxWidth: 250, width: 250}}>
-                                <Text style={[item.estado ? {color: 'green'} : {color: 'red'},{ fontSize: 20, marginLeft: 10, marginTop: 3, fontWeight: 'bold' }]}>{item.nombre}</Text>
+                                <Text style={[item.estado ? {color: 'green'} : {color: 'orange'},{ fontSize: 20, marginLeft: 10, marginTop: 3, fontWeight: 'bold' }]}>{item.nombre}</Text>
                             </View>
                             <View style={{height: 30, width: 100, maxWidth: 250, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
                                 {item.colaboradores.length > 0 && <Fontisto name="persons" size={18} color="black" style={{padding: 5}}/>}

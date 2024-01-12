@@ -2,22 +2,37 @@ import { useState, useEffect, createContext } from "react";
 import clienteAxios from "../config/clienteAxios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { io } from "socket.io-client";
+
+let socket;
 
 const TareasContext = createContext();
 
 const TareasProvider = ({ children }) => {
 
-
     const router = useRouter();
 
     const [tareas, setTareas] = useState([]);
+    const [tareasFiltradas, setTareasFiltradas] = useState([]);
+    const [lista, setLista] = useState([])
     const [tarea, setTarea] = useState([]);
     const [alerta, setAlerta] = useState([]);
     const [categorias, setCategorias] = useState({})
     const [users, setUsers] = useState({})
+    const [search, setSearch] = useState('')
+
+    useEffect(() => {
+        socket = io(process.env.EXPO_PUBLIC_BACKEND_URL)
+    }, [])
+
+    useEffect(() => {
+
+    })
 
     useEffect(() => {
         const fetchTareasData = async () => {
+
+            setSearch('')
 
             try {
 
@@ -87,6 +102,30 @@ const TareasProvider = ({ children }) => {
 
     }, [])
 
+    useEffect(() => {
+        if(search.length > 0){
+            const newData = tareas.filter( t => {
+                const itemData = t.nombre ? t.nombre.toLowerCase() : ''.toLowerCase();
+                const textdata = search.toLowerCase();
+
+                return itemData.indexOf(textdata) > -1;
+            })
+
+            setTareasFiltradas(newData)
+        }else{
+            setTareasFiltradas([])
+        }
+    },[search])
+
+    const obtenerLista = () => {
+        if(tareasFiltradas.length === 0){
+            setLista(tareas)
+        }else{
+            setLista(tareasFiltradas)
+        }
+    }
+
+
 
 
     const mostrarAlerta = alerta => {
@@ -100,7 +139,9 @@ const TareasProvider = ({ children }) => {
 
     const handleTarea = async (item) => {
 
+
         try {
+
             await AsyncStorage.setItem('tarea', item._id)
 
 
@@ -155,7 +196,12 @@ const TareasProvider = ({ children }) => {
                 tarea,
                 handleTarea,
                 obtenerCategoria,
-                users
+                users,
+                search,
+                setSearch,
+                tareasFiltradas,
+                lista,
+                obtenerLista
             }}
         >
             {children}

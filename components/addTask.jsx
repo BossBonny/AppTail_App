@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Text,
     View,
@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { io } from 'socket.io-client';
 
 import useTareas from '../hook/useTareas';
 import clienteAxios from '../config/clienteAxios';
@@ -18,6 +19,8 @@ import CategoriaComp from '../re-comps/categoriaComp';
 import PrioridadComp from '../re-comps/prioridadComp';
 import TicketComp from '../re-comps/ticketComp';
 import ColaboradoresComp from '../re-comps/colaboradoresComp';
+
+let socket;
 
 const AddTask = () => {
 
@@ -48,6 +51,10 @@ const AddTask = () => {
     const [col, setCol] = useState('')
     const [colaboradores, setColaboradores] = useState([])
     const [usuariosFiltrados, setUsuariosFiltrados] = useState({})
+
+    useEffect(() => {
+        socket = io(process.env.EXPO_PUBLIC_BACKEND_URL);
+    }, [])
 
     const handleNuevaEtiqueta = () => {
         if (etiqueta.nombre !== '') {
@@ -143,6 +150,10 @@ const AddTask = () => {
             await clienteAxios.post(`/tareas`, { nombre, categoria, prioridad, etiquetas, creador, colaboradores })
 
             setCreado(true)
+
+            //Socket
+
+            socket.emit()
 
             setTimeout(() => {
                 setCreado(false)

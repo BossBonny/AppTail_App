@@ -5,7 +5,7 @@ import {
     View,
     TextInput,
     Pressable,
-    Modal,
+    Modal
 } from "react-native";
 import { AntDesign, Feather, EvilIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
@@ -19,12 +19,10 @@ const Header = () => {
 
     const router = useRouter();
 
-    const {auth} = useAuth();
-    const {cerrarSesion} = useTareas();
+    const { auth } = useAuth();
+    const { cerrarSesion, setSearch } = useTareas();
 
     const [modalVisible, setModalVisible] = useState(false);
-
-
 
     return (
         <View>
@@ -79,11 +77,12 @@ const Header = () => {
                 </Pressable>
                 <View style={styles.contSearchBar}>
                     <TextInput
-                        style={{ marginLeft: 20, flex: 1 }}
-                        placeholder="Search..."
+                        style={{ marginLeft: 20, width: 220 }}
+                        placeholder='Busca la tarea'
+                        onChangeText={(text) => setSearch(text)}
                     />
                     <Pressable
-                        style={{ marginRight: 10, padding: 5 }}
+                        style={{ marginRight: 10, padding: 5, width: 40 }}
                     >
                         <AntDesign name="search1" size={24} color="black" />
                     </Pressable>

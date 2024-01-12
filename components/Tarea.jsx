@@ -19,7 +19,6 @@ import PrioridadComp from '../re-comps/prioridadComp';
 import TicketComp from '../re-comps/ticketComp';
 import ColaboradoresComp from '../re-comps/colaboradoresComp';
 
-
 const Tarea = () => {
 
     const router = useRouter();
@@ -53,30 +52,19 @@ const Tarea = () => {
     const [realizada, setRealizada] = useState(false)
 
 
-
     useEffect(() => {
         const obtenerTarea = async () => {
             try {
+
                 const token = await AsyncStorage.getItem('token');
                 if (!token) return
 
-                const config = {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-
-                const { data } = await clienteAxios('/usuarios/perfil', config);
-
                 const tareaId = await AsyncStorage.getItem('tarea');
-
-                const params = [tareaId, data._id]
 
                 if (!tareaId) {
                     console.log('No hay Tarea')
                 } else {
-                    const { data } = await clienteAxios(`/tareas/tarea/${params}`);
+                    const { data } = await clienteAxios(`/tareas/tarea/${tareaId}`);
 
                     setNombre(data.nombre);
                     setCat(data.categoria);
@@ -181,22 +169,11 @@ const Tarea = () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) return
 
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            }
-        }
-
-        const { data } = await clienteAxios('/usuarios/perfil', config);
-
         const tareaId = await AsyncStorage.getItem('tarea');
-
-        const params = [tareaId, data._id]
 
         try {
 
-            await clienteAxios.put(`/tareas/tarea/${params}`, { nombre, categoria, prioridad, etiquetas, colaboradores, estado })
+            await clienteAxios.put(`/tareas/tarea/${tareaId}`, { nombre, categoria, prioridad, etiquetas, colaboradores, estado })
 
             setActualizado(true)
 
@@ -217,21 +194,10 @@ const Tarea = () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) return
 
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            }
-        }
-
-        const { data } = await clienteAxios('/usuarios/perfil', config);
-
         const tareaId = await AsyncStorage.getItem('tarea');
 
-        const params = [tareaId, data._id]
-
         try {
-            await clienteAxios.delete(`/tareas/tarea/${params}`)
+            await clienteAxios.delete(`/tareas/tarea/${tareaId}`)
 
             await AsyncStorage.removeItem('tarea');
 
@@ -276,7 +242,7 @@ const Tarea = () => {
             </View>
             {opcional &&
                 <View>
-                
+
                     <TicketComp count={count} etiquetas={etiquetas} setEtiquetaEliminar={setEtiquetaEliminar} etiquetaEliminada={etiquetaEliminada}
                         setModalEtiqueta={setModalEtiqueta} modalEtiqueta={modalEtiqueta} setEtiqueta={setEtiqueta} etiqueta={etiqueta} handleNuevaEtiqueta={handleNuevaEtiqueta} />
 
@@ -286,13 +252,13 @@ const Tarea = () => {
                 </View>
             }
             <Pressable
-                style={[ realizada ? { backgroundColor: 'green'} : { backgroundColor: 'orange'} , { height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 20 }]}
+                style={[realizada ? { backgroundColor: 'green' } : { backgroundColor: 'orange' }, { height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 20 }]}
                 onPress={() => { setRealizada(!realizada) }}
             >
                 <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold' }}>{realizada ? 'Realizada' : 'Pendiente'}</Text>
             </Pressable>
             <Pressable
-                style={[actualizado ? { backgroundColor: 'green' } : { backgroundColor: 'black' }, { height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 20 , marginVertical: 20}]}
+                style={[actualizado ? { backgroundColor: 'green' } : { backgroundColor: 'black' }, { height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 20, marginVertical: 20 }]}
                 onPress={() => handleUpdate()}
             >
                 {actualizado
